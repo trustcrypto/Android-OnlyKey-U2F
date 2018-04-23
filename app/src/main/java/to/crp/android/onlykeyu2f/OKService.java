@@ -169,14 +169,10 @@ public final class OKService extends IntentService {
                         .show());
     }
 
-    private void permissionsCheck() {
+    private void permissionsCheck() throws IOException {
         if (manager.hasPermission(d)) {
             Log.d(TAG, "Have permission.");
-            try {
-                addOnlyKey();
-            } catch (IOException ioe) {
-                handleError(ioe);
-            }
+            addOnlyKey();
         } else {
             Log.d(TAG, "Requesting permission.");
             final PendingIntent mPermissionIntent = PendingIntent

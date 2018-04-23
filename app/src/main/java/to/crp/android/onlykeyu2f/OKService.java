@@ -60,7 +60,6 @@ public final class OKService extends IntentService {
                         addOnlyKey();
                     } catch (IOException ioe) {
                         handleError(ioe);
-                        Log.e(TAG, ioe.getMessage(), ioe);
                     }
                 } else {
                     toastLong(getString(R.string.msg_perm_denied));

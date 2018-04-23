@@ -33,6 +33,10 @@ public class MainActivity extends Activity implements ServiceCallback {
             myService = binder.getService();
             bound = true;
             myService.setCallback(MainActivity.this); // register
+
+            final Intent intent = new Intent(MainActivity.this, OKService.class);
+            intent.putExtra(Intent.EXTRA_INTENT, getIntent());
+            startService(intent);
         }
 
         @Override
@@ -64,13 +68,8 @@ public class MainActivity extends Activity implements ServiceCallback {
             return;
         }
 
-        Intent intent = new Intent(this, OKService.class);
+        final Intent intent = new Intent(this, OKService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
-
-        intent = new Intent(this, OKService.class);
-        intent.putExtra(Intent.EXTRA_INTENT, getIntent());
-
-        startService(intent);
 
         moveTaskToBack(false);
     }

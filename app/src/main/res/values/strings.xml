@@ -1,14 +1,13 @@
 <resources>
     <string name="app_name">OnlyKey U2F</string>
+    <string name="err_perm_denied">Permission denied!</string>
+    <string name="err_no_onlykey">No OnlyKey present.</string>
     <string name="launch_err">"OnlyKey U2F cannot be launched directly."</string>
-    <string name="msg_attach_onlykey">Attach OnlyKey.</string>
     <string name="msg_dev_locked">OnlyKey is locked.</string>
     <string name="msg_dev_unlocked">OnlyKey is unlocked.</string>
-    <string name="msg_error">Error!</string>
-    <string name="msg_no_onlykey">No OnlyKey present.</string>
+    <string name="msg_error">OnlyKey Error!</string>
     <string name="msg_ok_attached">OnlyKey attached.</string>
     <string name="msg_ok_detached">OnlyKey detached.</string>
-    <string name="msg_perm_denied">OnlyKey: permission denied!</string>
     <string name="msg_setup_required">OnlyKey setup required!</string>
     <string name="msg_set_time">OnlyKey time set!</string>
     <string name="msg_waiting_for_unlock">Waiting for OnlyKey unlock&#8230;</string>

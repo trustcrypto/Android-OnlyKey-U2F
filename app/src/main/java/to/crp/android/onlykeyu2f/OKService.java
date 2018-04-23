@@ -62,8 +62,7 @@ public final class OKService extends IntentService {
                         handleError(ioe);
                     }
                 } else {
-                    toastLong(getString(R.string.msg_perm_denied));
-                    Log.d(TAG, "Permission denied.");
+                    handleError(new Exception(getString(R.string.err_perm_denied)));
                 }
             }
         }
@@ -150,6 +149,11 @@ public final class OKService extends IntentService {
     private void handleError(final Exception e) {
         toastLong(getString(R.string.msg_error) + ": " + e.getMessage());
         Log.e(TAG, e.getMessage(), e);
+
+        if (callback != null) {
+            callback.resultData("");
+        }
+
         stopSelf();
     }
 

@@ -5,6 +5,8 @@ U2F two factor authentication and PGP functionality are only supported in the Ch
 
 Note: This application facilitates communication between the OnlyKey and your Android device. There is currently no user interface.
 
+The app is available on [Google Play here](https://play.google.com/store/apps/details?id=to.crp.android.onlykeyu2f)
+
 # Web Links
 
 OnlyKey Store - https://onlykey.io

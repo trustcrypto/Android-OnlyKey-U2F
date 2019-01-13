@@ -17,8 +17,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import to.crp.android.u2f.U2FContext;
@@ -228,33 +226,24 @@ public final class OKService extends IntentService {
                 final U2FContext u2fContext = U2FContext.parseU2FContext(request);
 
                 if (key == null) {
-                    final Map<String, UsbDevice> attached = manager.getDeviceList();
+                    final Map<String, UsbDevice> devs = manager.getDeviceList();
+                    if (devs.isEmpty())
+                        throw new IOException("No OnlyKey present!");
 
-                    // filter to OnlyKeys
-                    final List<UsbDevice> onlyKeys = new ArrayList<>();
-                    for (final UsbDevice d : attached.values())
-                        if (d.getVendorId() == 5824 && d.getProductId() == 1158)
-                            onlyKeys.add(d);
-
-                    if (onlyKeys.isEmpty()) throw new IOException("No OnlyKey present!");
-
-                    if (onlyKeys.size() > 1)
-                        throw new IOException(
-                                "No support for multiple OnlyKeys attached at once!");
+                    if (devs.size() > 1)
+                        throw new IOException("No support for multiple OnlyKeys attached at once!");
 
                     Log.d(TAG, "Found an already-connected OnlyKey.");
 
-                    d = onlyKeys.get(0);
+                    d = devs.values().iterator().next();
 
                     this.u2fContext = u2fContext;
 
                     permissionsCheck(); // creates OnlyKeys on permission granted intent
-
                 } else {
                     key.addU2fRequest(u2fContext);
                     Log.w(TAG, "Added u2fContext.");
                 }
-
             } else {
                 Log.e(TAG, "Unhandled intent action: " + origIntent.getAction());
             }

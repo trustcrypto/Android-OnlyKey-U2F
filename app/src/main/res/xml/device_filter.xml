@@ -2,4 +2,5 @@
 
 <resources>
     <usb-device vendor-id="5824" product-id="1158" />
+    <usb-device vendor-id="7504" product-id="24828" />
 </resources>

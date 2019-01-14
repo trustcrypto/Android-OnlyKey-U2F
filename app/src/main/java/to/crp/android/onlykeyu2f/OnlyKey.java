@@ -37,6 +37,8 @@ class OnlyKey {
 
     private static final String TAG = "okd-key";
 
+    private static final int READ_TIMEOUT = 3*1000;
+
     private static final int OK_HID_INTERFACE = 1;
     private static final int OK_HID_INT_IN = 0;
     private static final int OK_HID_INT_OUT = 1;
@@ -87,7 +89,7 @@ class OnlyKey {
                 while (!done && !isCancelledOrInterrupted()) {
                     //Log.d(TAG, "Waiting for message.");
                     try {
-                        byte[] in = read(3 * 1000);
+                        byte[] in = read();
                         done = handleMessage(in);
                     } catch (IOException ioe) {
                         break;
@@ -240,7 +242,7 @@ class OnlyKey {
     /**
      * Kick off time set to determine if key is unlocked and usable.
      */
-    public final void init() {
+    final void init() {
         new Thread(initializer, "initializer").start();
     }
 
@@ -291,7 +293,7 @@ class OnlyKey {
      *
      * @throws IOException Thrown on operation error.
      */
-    public void doU2fProcessing() throws IOException {
+    void doU2fProcessing() throws IOException {
         if (u2fRequests.size() > 0) {
             Log.d(TAG, "SN: " + serial + ": Processing " + u2fRequests.size() + " U2F request(s).");
         } else {
@@ -478,7 +480,7 @@ class OnlyKey {
         notifyListeners(new OKEvent(this, OKEvent.OKEType.SET_LOCKED, value));
     }
 
-    private byte[] read(final int timeout) throws IOException {
+    private byte[] read() throws IOException {
         final UsbRequest requestRead = new UsbRequest();
 
         final Callable<byte[]> c = () -> {
@@ -509,7 +511,7 @@ class OnlyKey {
         final Future<byte[]> f = ex.submit(c);
 
         try {
-            return f.get(timeout, TimeUnit.MILLISECONDS);
+            return f.get(READ_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException | TimeoutException | ExecutionException e) {
             requestRead.cancel();
             throw new IOException("Error reading data.", e);

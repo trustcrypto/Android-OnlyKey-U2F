@@ -66,6 +66,7 @@ class OnlyKey {
     private final UsbEndpoint epOut;
 
     private boolean initialized = false;
+    private int unlockcount = 0;
 
     private final LinkedBlockingQueue<U2FContext> u2fRequests = new LinkedBlockingQueue<>();
 
@@ -265,18 +266,19 @@ class OnlyKey {
         }
 
         if (msg.contains("UNLOCKED")) {
-            setInitialized(true);
-
-            final String[] s = msg.split("UNLOCKED");
-            if (s.length == 2) {
-                final String ver = msg.split("UNLOCKED")[1].trim();
-                if (!ver.isEmpty()) {
-                    Log.d(TAG, "OK version: " + ver);
-                    return true;
+            if (++unlockcount == 2) {
+                final String[] s = msg.split("UNLOCKED");
+                if (s.length == 2) {
+                    final String ver = msg.split("UNLOCKED")[1].trim();
+                    if (!ver.isEmpty()) {
+                        Log.d(TAG, "OK version: " + ver);
+                    }
                 }
-            }
 
-            setLocked(false);
+                setInitialized(true);
+                setLocked(false);
+                return true;
+            }
         } else if (msg.contains("LOCKED")) {
             setLocked(true);
         }

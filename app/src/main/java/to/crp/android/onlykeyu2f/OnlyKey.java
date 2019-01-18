@@ -39,9 +39,9 @@ class OnlyKey {
 
     private static final int READ_TIMEOUT = 3*1000;
 
-    private static final int OK_HID_INTERFACE = 1;
-    private static final int OK_HID_INT_IN = 0;
-    private static final int OK_HID_INT_OUT = 1;
+    private static final int HID_INT_INDEX = 1;
+    private static final int HID_INT_EP_INDEX_IN = 0;
+    private static final int HID_INT_EP_INDEX_OUT = 1;
 
     /**
      * OnlyKey message header.
@@ -189,16 +189,18 @@ class OnlyKey {
      */
     static OnlyKey getOnlyKey(final UsbDevice device, final UsbManager manager) throws IOException {
         // get interface
-        if (device.getInterfaceCount() < OK_HID_INTERFACE)
+        if (device.getInterfaceCount() < HID_INT_INDEX + 1) {
             throw new IOException("USB device does not have any interfaces!");
+        }
+        final UsbInterface intHID = device.getInterface(HID_INT_INDEX);
 
         // get HID input endpoint
-        final UsbInterface intHID = device.getInterface(OK_HID_INTERFACE);
-        if (intHID.getEndpointCount() < Math.max(OnlyKey.OK_HID_INT_IN, OnlyKey.OK_HID_INT_OUT)) {
+        if (intHID.getEndpointCount() <
+                Math.max(OnlyKey.HID_INT_EP_INDEX_IN, OnlyKey.HID_INT_EP_INDEX_OUT) + 1) {
             throw new IOException(
-                    "OK HID int " + OK_HID_INTERFACE + " doesn't have two endpoints!");
+                    "OK HID int " + HID_INT_INDEX + " doesn't have two endpoints!");
         }
-        final UsbEndpoint epIn = intHID.getEndpoint(OnlyKey.OK_HID_INT_IN);
+        final UsbEndpoint epIn = intHID.getEndpoint(OnlyKey.HID_INT_EP_INDEX_IN);
         if (epIn.getType() != UsbConstants.USB_ENDPOINT_XFER_INT) {
             throw new IOException("Endpoint is not type INTERRUPT!");
         }
@@ -208,7 +210,7 @@ class OnlyKey {
 //                () == UsbConstants.USB_DIR_IN ? "In" : "Out"));
 
         // get HID output endpoint
-        final UsbEndpoint epOut = intHID.getEndpoint(OnlyKey.OK_HID_INT_OUT);
+        final UsbEndpoint epOut = intHID.getEndpoint(OnlyKey.HID_INT_EP_INDEX_OUT);
         if (epOut.getType() != UsbConstants.USB_ENDPOINT_XFER_INT) {
             throw new IOException("Endpoint is not type INTERRUPT");
         }
@@ -352,8 +354,8 @@ class OnlyKey {
                     bos.write(msgLength & 0xff);
                     final MessageDigest digest = MessageDigest.getInstance("SHA-256");
                     bos.write(digest.digest(
-                            U2FContext.createClientData(u2fContext).getBytes("UTF-8")));
-                    bos.write(digest.digest(u2fContext.getAppId().getBytes("UTF-8")));
+                            U2FContext.createClientData(u2fContext).getBytes(StandardCharsets.UTF_8)));
+                    bos.write(digest.digest(u2fContext.getAppId().getBytes(StandardCharsets.UTF_8)));
                     bos.write(keyHandle.length);
                     bos.write(keyHandle);
                     bos.write(0x00);
@@ -421,8 +423,8 @@ class OnlyKey {
                 bos.write(msgLength >> 8);
                 bos.write(msgLength & 0xff);
                 final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-                bos.write(digest.digest(U2FContext.createClientData(u2fContext).getBytes("UTF-8")));
-                bos.write(digest.digest(u2fContext.getAppId().getBytes("UTF-8")));
+                bos.write(digest.digest(U2FContext.createClientData(u2fContext).getBytes(StandardCharsets.UTF_8)));
+                bos.write(digest.digest(u2fContext.getAppId().getBytes(StandardCharsets.UTF_8)));
                 bos.write(0x00);
                 bos.write(0x00);
                 final byte[] authApdu = bos.toByteArray();
